@@ -1,0 +1,69 @@
+plugins {
+    id "com.gradleup.shadow" version "9.4.0"
+}
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+sourceSets.main.resources { srcDir project(':common').file('src/generated/resources').getAbsolutePath() }
+
+loom {
+    accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
+}
+
+configurations {
+    common
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+}
+
+/*
+repositories {
+    maven {
+        // Mod Menu
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/"
+    }
+}
+*/
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
+
+    api "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+
+    api "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+
+    common(project(path: ":common")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
+}
+
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('fabric.mod.json') {
+        expand version: project.version
+    }
+}
+
+jar {
+    archiveClassifier = "raw"
+}
+
+java {
+    withSourcesJar()
+}
+
+shadowJar {
+    dependsOn(jar)
+    mainSpec.sourcePaths.clear()
+    from(zipTree(jar.archiveFile))
+
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier = null
+    from rootProject.file("LICENSE.md")
+}
