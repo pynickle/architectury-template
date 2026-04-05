@@ -19,3 +19,11 @@ hs_err_pid*
 
 # Common working directory
 run
+
+.agents/
+
+skills-lock.json
+
+.project
+
+/.settings/
