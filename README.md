@@ -8,7 +8,7 @@ This repository is a minimal multi-loader template built with Architectury Loom.
 
 ## Project structure
 
-- `common/` — shared code, resources, and mixins
+- `common/` — shared code, resources, mixins, and the Access Widener
 - `fabric/` — Fabric entrypoints and metadata
 - `neoforge/` — NeoForge entrypoints and metadata
 - `gradle.properties` — shared versions and mod coordinates
@@ -39,24 +39,22 @@ Before turning this into a real project, update at least:
 - metadata in `neoforge/src/main/resources/META-INF/neoforge.mods.toml`
 - resource file names such as `example_mod.mixins.json` and `example_mod.accesswidener`
 
-## Removing access wideners / access transformers
+## Access wideners
 
-If your mod does **not** need access wideners or access transformers, remove the wiring as a group instead of deleting only one file.
+This template keeps a single Access Widener in `common/src/main/resources/${mod_id}.accesswidener` and wires both loaders to that file.
 
-### Remove Access Widener support
+- Fabric copies it into the jar (`processResources`) and injects it with Loom (`loom.injectAccessWidener`). `fabric.mod.json` declares the same file as `"accessWidener"`.
+- NeoForge reads the same file through `loom.accessWidenerPath` and converts it to `META-INF/accesstransformer.cfg` when building the remapped jar (`loom.neoForge.convertAccessWideners`). There is no hand-written Access Transformer source file.
 
-Delete these references:
+### Removing access widener support
+
+If your mod does **not** need access wideners, remove the wiring as a group instead of deleting only one file.
 
 - `common/build.gradle` → `loom { accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener") }`
-- `fabric/build.gradle` → `loom { accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener") }`
-- `neoforge/build.gradle` → `exclude "${mod_id}.accesswidener"`
 - `common/src/main/resources/example_mod.accesswidener`
-- `fabric/src/main/resources/example_mod.accesswidener`
-
-### Remove Access Transformer support
-
-Delete these references:
-
+- `fabric/build.gradle` → `commonAccessWidener`, `loom.accessWidenerPath`, `processResources { from(commonAccessWidener) }`, `shadowJar { exclude "${mod_id}.accesswidener" }`, and `loom.injectAccessWidener(...)`
+- `fabric/src/main/resources/fabric.mod.json` → `"accessWidener": "example_mod.accesswidener"`
+- `neoforge/build.gradle` → `commonAccessWidener`, `loom.accessWidenerPath`, and `loom.neoForge { convertAccessWideners(...) }`
 - `neoforge/src/main/resources/META-INF/neoforge.mods.toml` →
 
 ```toml
@@ -64,10 +62,8 @@ Delete these references:
 file="META-INF/accesstransformer.cfg"
 ```
 
-- `neoforge/src/main/resources/META-INF/accesstransformer.cfg`
-
 > [!TIP]
-> In this template, Fabric does not declare an access widener entry in `fabric.mod.json`, so you do not need to remove anything there.
+> NeoForge still lists `META-INF/accesstransformer.cfg` in `neoforge.mods.toml` because Loom generates that file from the common Access Widener at jar time. Do not add `neoforge/src/main/resources/META-INF/accesstransformer.cfg` unless you are leaving this shared-widener setup.
 
 ## Notes
 

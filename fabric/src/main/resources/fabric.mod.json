@@ -24,6 +24,7 @@
   "mixins": [
     "example_mod.mixins.json"
   ],
+  "accessWidener": "example_mod.accesswidener",
   "depends": {
     "fabricloader": ">=0.18",
     "minecraft": "~26.1",
