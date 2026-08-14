@@ -21,9 +21,6 @@ hs_err_pid*
 run
 
 .agents/
+.claude/
 
 skills-lock.json
-
-.project
-
-/.settings/

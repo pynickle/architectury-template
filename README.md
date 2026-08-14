@@ -27,7 +27,7 @@ This repository is a minimal multi-loader template built with Architectury Loom.
 Use your IDE's generated run configs, or Gradle tasks, to launch Fabric or NeoForge during development.
 
 > [!NOTE]
-> This template currently targets Minecraft `26.1.1`, Fabric Loader `0.18.6`, Fabric API `0.145.3+26.1.1`, and NeoForge `26.1.1.6-beta`.
+> This template currently targets Minecraft `26.1.2`, Fabric Loader `0.19.3`, Fabric API `0.155.2+26.1.2`, and NeoForge `26.1.2.95`.
 
 ## What to rename first
 
